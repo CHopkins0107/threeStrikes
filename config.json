@@ -1,0 +1,7 @@
+{
+  "prefix": "!",
+  "invite_link": "https://discord.com/oauth2/authorize?client_id=1291317479360036906&scope=bot+applications.commands&permissions=564187307043906",
+  "trigger_emoji": "thumbsdown",
+  "punishment_type": "timeout",
+  "timeout_duration": 120
+}
