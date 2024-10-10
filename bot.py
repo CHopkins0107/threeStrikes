@@ -140,7 +140,7 @@ class DiscordBot(commands.Bot):
         """
         self.logger = logger
         self.config = config
-        self.database = None
+        self.database = DatabaseManager
 
     async def init_db(self) -> None:
         async with aiosqlite.connect(
@@ -173,7 +173,7 @@ class DiscordBot(commands.Bot):
         """
         Setup the game status task of the bot.
         """
-        statuses = ["Black Ops 6"]
+        statuses = ["Black Ops 6", "with Kevin."]
         await self.change_presence(activity=discord.Game(random.choice(statuses)))
 
     @status_task.before_loop
@@ -287,6 +287,10 @@ class DiscordBot(commands.Bot):
         else:
             raise error
         
+    """
+    Event Listeners for Tribunal Functionality below.
+    """
+        
     async def on_reaction_add(self, reaction, user):
         """
         Event listener for message reactions
@@ -294,14 +298,25 @@ class DiscordBot(commands.Bot):
         :param reaction: The reaction event, required to get corresponding message/author
         :param user: The user that reacted, unused
         """
-        print("Reaction called")
         # emoji_name = self.get_emoji_name(reaction.emoji)
         if reaction.emoji == "👎":
+            print("Reaction logged")
             message = reaction.message
             if reaction.count >= 3:
                 await self.apply_punishment(message.author)
                 await message.delete()
                 await message.channel.send(f"{message.author.mention} has been timed out for {bot.config['timeout_duration']} seconds for saying: {message.content}")
+                
+    async def on_message_delete(self, message):
+        """
+        Event listener for deleted messages. If a message has downvote reactions, automatically punish.
+
+        :param message: The deleted message
+        """
+        if "👎" in message.reactions:
+            await self.apply_punishment(message.author)
+            await message.channel.send(f"{message.author.mention} has been timed out for {bot.config['timeout_duration']} seconds for deleting the following message mid-vote: {message.content}")
+            
                 
     async def apply_punishment(self, member):
         """

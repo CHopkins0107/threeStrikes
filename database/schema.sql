@@ -1,8 +1,10 @@
-CREATE TABLE IF NOT EXISTS `warns` (
-  `id` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `tribunal` (
   `user_id` varchar(20) NOT NULL,
   `server_id` varchar(20) NOT NULL,
-  `moderator_id` varchar(20) NOT NULL,
-  `reason` varchar(255) NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+  `likes_received` int(9) NOT NULL,
+  `likes_given` int(9) NOT NULL,
+  `dislikes_received` int(9) NOT NULL,
+  `dislikes_given` int(9) NOT NULL,
+  `punishments_received` int(9) NOT NULL
+  PRIMARY KEY (`user_id`)
 );

@@ -6,9 +6,10 @@ Description:
 Version: 6.2.0
 """
 
+import discord
+from discord import app_commands
 from discord.ext import commands
 from discord.ext.commands import Context
-
 
 # Here we name the cog and create a new class for the cog.
 class Tribunal(commands.Cog, name="tribunal"):
@@ -18,19 +19,29 @@ class Tribunal(commands.Cog, name="tribunal"):
     # Here you can just add your own commands, you'll always need to provide "self" as first parameter.
 
     @commands.hybrid_command(
-        name="testcommand1",
-        description="This is a testing command that does nothing.",
+        name="checkdislikes",
+        description="Checks how many dislikes a user has received overall",
     )
-    async def testcommand1(self, context: Context) -> None:
+    #FIX-ME: remove in final build
+    @app_commands.guilds(discord.Object(id=315163931293384704))
+    async def check_dislikes(self, context: Context, user: discord.User) -> None:
         """
         This is a testing command that does nothing.
 
         :param context: The application command context.
         """
-        # Do your stuff here
-
-        # Don't forget to remove "pass", I added this just because there's no content in the method.
-        pass
+        # check if user exists
+        db = self.bot.database
+        user_id = user.id
+        server_id = context.guild.id
+        
+        user_data = await db.check_user(user_id, server_id)
+        
+        if user_data:
+            print("real")
+        else:
+            print("not real")
+        
 
 
 # And then we finally add the cog to the bot so that it can load, unload, reload and use it's content.
