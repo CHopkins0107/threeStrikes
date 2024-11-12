@@ -1,10 +1,19 @@
 CREATE TABLE IF NOT EXISTS `tribunal` (
-  `user_id` varchar(20) NOT NULL,
-  `server_id` varchar(20) NOT NULL,
-  `likes_received` int(9) NOT NULL,
-  `likes_given` int(9) NOT NULL,
-  `dislikes_received` int(9) NOT NULL,
-  `dislikes_given` int(9) NOT NULL,
-  `punishments_received` int(9) NOT NULL
-  PRIMARY KEY (`user_id`)
+  `user_id` VARCHAR(20) NOT NULL,
+  `server_id` VARCHAR(20) NOT NULL,
+  `likes_received` INTEGER NOT NULL,
+  `likes_given` INTEGER NOT NULL,
+  `dislikes_received` INTEGER NOT NULL,
+  `dislikes_given` INTEGER NOT NULL,
+  `punishments_received` INTEGER NOT NULL,
+  PRIMARY KEY (`user_id`, `server_id`)
+);
+
+CREATE TABLE IF NOT EXISTS `messages` (
+  `user_id` VARCHAR(20) NOT NULL,
+  `server_id` VARCHAR(20) NOT NULL,
+  `message` TEXT NOT NULL,
+  `dislikes` INTEGER NOT NULL,
+  `date` DATETIME NOT NULL,
+  PRIMARY KEY (`user_id`, `server_id`)
 );

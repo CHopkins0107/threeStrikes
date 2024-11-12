@@ -16,6 +16,7 @@ import datetime
 
 import aiosqlite
 import discord
+from discord import Message
 from discord.ext import commands, tasks
 from discord.ext.commands import Context
 from dotenv import load_dotenv
@@ -300,12 +301,27 @@ class DiscordBot(commands.Bot):
         """
         # emoji_name = self.get_emoji_name(reaction.emoji)
         if reaction.emoji == "👎":
-            print("Reaction logged")
+            user_id = reaction.message.author.id
+            server_id = reaction.message.guild.id
+            reacting_user_id = user.id
+            
+            # If user is reacting to their own message, ignore
+            if user_id == reacting_user_id:
+                return
+            
+            # If user is not present in database, add them and update their dislikes
+            if not (await self.database.update_dislikes(user_id, server_id, 1)):
+                await self.database.check_user(user_id, server_id, create_if_none=True)
+                await self.database.update_dislikes(user_id, server_id, 1)
+                print("User added, reaction logged")
+                
+            # Increase dislikes given by reacting user
+            await self.database.update_dislikes_given(reacting_user_id, server_id, 1)
+            
             message = reaction.message
-            if reaction.count >= 3:
-                await self.apply_punishment(message.author)
-                await message.delete()
-                await message.channel.send(f"{message.author.mention} has been timed out for {bot.config['timeout_duration']} seconds for saying: {message.content}")
+            if reaction.count >= self.config['threshold']:
+                await self.apply_punishment(message)
+                
                 
     async def on_message_delete(self, message):
         """
@@ -318,21 +334,26 @@ class DiscordBot(commands.Bot):
             await message.channel.send(f"{message.author.mention} has been timed out for {bot.config['timeout_duration']} seconds for deleting the following message mid-vote: {message.content}")
             
                 
-    async def apply_punishment(self, member):
+    async def apply_punishment(self, message: Message):
         """
         Applies a punishment to the member
 
         :param member: The member to punish
         """
+        member = message.author
+        
         print("Punishment called")
         if bot.config['punishment_type'] == 'timeout':
             print("Timeout")
             await member.timeout(datetime.timedelta(seconds=bot.config['timeout_duration']))
         elif bot.config['punishment_type'] == 'kick':
             await member.kick(reason="Received 3 trigger reactions")
+            
+        await self.database.update_punishments(member.id, member.guild.id, 1, message.content, dislikes=bot.config['threshold'])
         
+        await message.delete()
+        await message.channel.send(f"{message.author.mention} has been timed out for {bot.config['timeout_duration']} seconds for saying: {message.content}")
         
-
 
 load_dotenv()
 

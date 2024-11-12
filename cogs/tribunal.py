@@ -19,30 +19,17 @@ class Tribunal(commands.Cog, name="tribunal"):
     # Here you can just add your own commands, you'll always need to provide "self" as first parameter.
 
     @commands.hybrid_command(
-        name="checkdislikes",
-        description="Checks how many dislikes a user has received overall",
+        name="threshold",
+        description="Sets the amount of dislikes needed to administer punishment.",
     )
-    #FIX-ME: remove in final build
-    @app_commands.guilds(discord.Object(id=315163931293384704))
-    async def check_dislikes(self, context: Context, user: discord.User) -> None:
+    async def threshold(self, context: Context, user: discord.User) -> None:
         """
-        This is a testing command that does nothing.
+        Sets the amount of dislikes needed to administer punishment.
 
         :param context: The application command context.
         """
-        # check if user exists
-        db = self.bot.database
-        user_id = user.id
-        server_id = context.guild.id
+        self.bot.config['threshold']
         
-        user_data = await db.check_user(user_id, server_id)
-        
-        if user_data:
-            print("real")
-        else:
-            print("not real")
-        
-
 
 # And then we finally add the cog to the bot so that it can load, unload, reload and use it's content.
 async def setup(bot) -> None:
